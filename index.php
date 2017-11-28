@@ -190,11 +190,11 @@
       <nav class="navbar navbar-default">
         <div class="row col-md-12">
           <div class="col-md-6">
-            <p class="navbar-text signed">Signed in as <?php echo $_SESSION['admin_id']; ?>
+            <p class="navbar-text signed">管理员登陆 <?php echo $_SESSION['admin_id']; ?>
             </div>
             <div class="col-md-6">
-              <a class="navbar-text navbar-right" href="index.php?logout" title="Logout"><button class="btn btn-danger">Logout</button></a>
-              <a class="navbar-text navbar-right" href="index.php" title="Configuration"><button class="btn btn-default">Configurations</button></a>
+              <a class="navbar-text navbar-right" href="index.php?logout" title="Logout"><button class="btn btn-danger">注销</button></a>
+              <a class="navbar-text navbar-right" href="index.php" title="Configuration"><button class="btn btn-default">配置</button></a>
             </p>
           </div>
         </div>

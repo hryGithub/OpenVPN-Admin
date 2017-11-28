@@ -3,8 +3,8 @@
 
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
-        <li <?php if(!isset($_GET['admin'])) echo 'class="active"'; ?>><a href="index.php">Configurations</a></li>
-        <li <?php if(isset($_GET['admin'])) echo 'class="active"'; ?>><a href="index.php?admin">Administrator</a></li>
+        <li <?php if(!isset($_GET['admin'])) echo 'class="active"'; ?>><a href="index.php">配置</a></li>
+        <li <?php if(isset($_GET['admin'])) echo 'class="active"'; ?>><a href="index.php?admin">管理员</a></li>
       </ul>
     </div>
 
