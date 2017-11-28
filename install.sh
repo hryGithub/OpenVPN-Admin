@@ -163,6 +163,7 @@ if [[ ! -z $key_cn ]]; then
   export EASYRSA_REQ_CN=$key_cn
 fi
 
+cd /etc/openvpn/easy-rsa
 # Init PKI dirs and build CA certs
 ./easyrsa init-pki
 ./easyrsa build-ca nopass
