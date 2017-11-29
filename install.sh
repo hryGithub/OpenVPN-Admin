@@ -254,9 +254,12 @@ done
 # Copy ta.key inside the client-conf directory
 for directory in "./client-conf/gnu-linux/" "./client-conf/osx-viscosity/" "./client-conf/windows/"; do
   cp "/etc/openvpn/"{ca.crt,ta.key} $directory
-  mv client.conf $cert_org.conf
 done
 
+#
+mv $openvpn_admin/client-conf/gnu-linux/client.conf $openvpn_admin/client-conf/gnu-linux/$cert_org.conf
+mv $openvpn_admin/client-conf/osx-viscosity/client.conf $openvpn_admin/client-conf/osx-viscosity/$cert_org.conf
+mv $openvpn_admin/client-conf/windows/client.ovpn $openvpn_admin/client-conf/windows/$cert_org.ovpn
 # Install third parties
 bower --allow-root install
 chown -R "$user:$group" "$openvpn_admin"
