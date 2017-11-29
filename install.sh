@@ -240,6 +240,7 @@ cd "$openvpn_admin"
 sed -i "s/\$user = '';/\$user = '$mysql_user';/" "./include/config.php"
 sed -i "s/\$pass = '';/\$pass = '$mysql_pass';/" "./include/config.php"
 
+
 # Replace in the client configurations with the ip of the server and openvpn protocol
 for file in "./client-conf/gnu-linux/client.conf" "./client-conf/osx-viscosity/client.conf" "./client-conf/windows/client.ovpn"; do
   sed -i "s/remote xxx\.xxx\.xxx\.xxx 443/remote $ip_server $server_port/" $file
@@ -249,14 +250,17 @@ for file in "./client-conf/gnu-linux/client.conf" "./client-conf/osx-viscosity/c
   fi
 done
 
+
 # Copy ta.key inside the client-conf directory
 for directory in "./client-conf/gnu-linux/" "./client-conf/osx-viscosity/" "./client-conf/windows/"; do
   cp "/etc/openvpn/"{ca.crt,ta.key} $directory
+  mv client.conf $cert_org.conf
 done
 
 # Install third parties
 bower --allow-root install
 chown -R "$user:$group" "$openvpn_admin"
+
 
 printf "\033[1m\n#################################### Finish ####################################\n"
 
