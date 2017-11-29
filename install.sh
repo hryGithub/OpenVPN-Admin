@@ -126,8 +126,8 @@ EASYRSA_RELEASES=( $(
 EASYRSA_LATEST=${EASYRSA_RELEASES[0]}
 
 # Get the rsa keys
-wget -q https://github.com/OpenVPN/easy-rsa/releases/download/v${EASYRSA_LATEST}/EasyRSA-${EASYRSA_LATEST}.tgz
-if [ -f EasyRSA-${EASYRSA_LATEST}.tgz ];then
+wget -q -t 3 -T 30 https://github.com/OpenVPN/easy-rsa/releases/download/v${EASYRSA_LATEST}/EasyRSA-${EASYRSA_LATEST}.tgz
+if [ ! -f EasyRSA-${EASYRSA_LATEST}.tgz ];then
       echo "Failed to load EasyRSA-${EASYRSA_LATEST}.tgz"
       exit
 fi
