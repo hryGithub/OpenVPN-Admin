@@ -69,10 +69,10 @@ while [ $status_code -ne 0 ]; do
   status_code=$?
 done
 
-sql_result=$(echo "SHOW DATABASES" | mysql -u root --password="$mysql_root_pass" | grep -e "^openvpn-admin$")
+sql_result=$(echo "SHOW DATABASES" | mysql -u root --password="$mysql_root_pass" | grep -e "^openvpn$")
 # Check if the database doesn't already exist
 if [ "$sql_result" != "" ]; then
-  echo "The openvpn-admin database already exists."
+  echo "The database openvpn already exists."
   exit
 fi
 
@@ -127,6 +127,10 @@ EASYRSA_LATEST=${EASYRSA_RELEASES[0]}
 
 # Get the rsa keys
 wget -q https://github.com/OpenVPN/easy-rsa/releases/download/v${EASYRSA_LATEST}/EasyRSA-${EASYRSA_LATEST}.tgz
+if [ -f EasyRSA-${EASYRSA_LATEST}.tgz ];then
+      echo "Failed to load EasyRSA-${EASYRSA_LATEST}.tgz"
+      exit
+fi
 tar -xaf EasyRSA-${EASYRSA_LATEST}.tgz
 mv EasyRSA-${EASYRSA_LATEST} /etc/openvpn/easy-rsa
 rm -r EasyRSA-${EASYRSA_LATEST}.tgz
@@ -198,14 +202,13 @@ echo 1 > "/proc/sys/net/ipv4/ip_forward"
 echo "net.ipv4.ip_forward = 1" >> "/etc/sysctl.conf"
 
 # Iptable rules
-iptables -I FORWARD -i tun0 -j ACCEPT
-iptables -I FORWARD -o tun0 -j ACCEPT
-iptables -I OUTPUT -o tun0 -j ACCEPT
+#iptables -I FORWARD -i tun0 -j ACCEPT
+#iptables -I FORWARD -o tun0 -j ACCEPT
+#iptables -I OUTPUT -o tun0 -j ACCEPT
 
-iptables -A FORWARD -i tun0 -o eth0 -j ACCEPT
-iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -o eth0 -j MASQUERADE
-iptables -t nat -A POSTROUTING -s 10.8.0.2/24 -o eth0 -j MASQUERADE
+#iptables -A FORWARD -i tun0 -o eth0 -j ACCEPT
+#iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+#iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -o eth0 -j MASQUERADE
 
 
 printf "\n################## Setup MySQL database ##################\n"
