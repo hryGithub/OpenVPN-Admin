@@ -121,7 +121,7 @@
         $admin_repeat_pass = $_POST['repeat_admin_pass'];
 
         if($admin_pass != $admin_repeat_pass) {
-          printError('The passwords do not correspond. Redirection.');
+          printError('两次输入的密码不一致！');
           header( "refresh:3;url=index.php?installation" );
           exit(-1);
         }
@@ -153,7 +153,7 @@
         $req->execute(array($admin_username, $hash_pass));
 
         rmdir(dirname(__FILE__) . '/sql');
-        printSuccess('Well done, OpenVPN-Admin is installed. Redirection.');
+        printSuccess('OpenVPN-Admin安装成功！请稍后...');
         header( "refresh:3;url=index.php?admin" );
       }
       // Print the installation form
