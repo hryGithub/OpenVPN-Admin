@@ -190,7 +190,7 @@
       <nav class="navbar navbar-default">
         <div class="row col-md-12">
           <div class="col-md-6">
-            <p class="navbar-text signed"> <?php echo $_SESSION['admin_id']; ?>登陆
+            <p class="navbar-text signed"> <?php echo $_SESSION['admin_id']; ?>已登陆
             </div>
             <div class="col-md-6">
               <a class="navbar-text navbar-right" href="index.php?logout" title="Logout"><button class="btn btn-danger">注销</button></a>
