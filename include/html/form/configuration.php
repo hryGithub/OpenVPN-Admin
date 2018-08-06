@@ -19,7 +19,7 @@
         </div>
 
         <div class="form-group">
-          <label for="configuration_os">系统版本</label>
+          <label for="configuration_os">操作系统</label>
           <select name="configuration_os" id="configuration_os" class="form-control">
             <option value="gnu_linux">GNU/Linux</option>
             <option value="osx_viscosity">OSX/Viscosity</option>
@@ -27,7 +27,7 @@
           </select>
         </div>
 
-        <input id="configuration_get" name="configuration_get" type="submit" value="下载配置文件" class="btn btn-default" />
+        <input id="configuration_get" name="configuration_get" type="submit" value="Get configuration files" class="btn btn-default" />
       </div>
 
     </form>

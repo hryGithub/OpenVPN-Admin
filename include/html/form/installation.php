@@ -21,7 +21,7 @@
         </div>
 
         <div class="form-group">
-          <label for="repeat_admin_pass">确认密码:</label>
+          <label for="repeat_admin_pass">再次输入密码:</label>
           <input type="password" id="repeat_admin_pass" name="repeat_admin_pass" class="form-control" />
         </div>
 

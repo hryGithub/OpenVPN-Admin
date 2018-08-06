@@ -69,10 +69,10 @@ while [ $status_code -ne 0 ]; do
   status_code=$?
 done
 
-sql_result=$(echo "SHOW DATABASES" | mysql -u root --password="$mysql_root_pass" | grep -e "^openvpn$")
+sql_result=$(echo "SHOW DATABASES" | mysql -u root --password="$mysql_root_pass" | grep -e "^openvpn-admin$")
 # Check if the database doesn't already exist
 if [ "$sql_result" != "" ]; then
-  echo "The database openvpn already exists."
+  echo "The openvpn-admin database already exists."
   exit
 fi
 
@@ -126,11 +126,7 @@ EASYRSA_RELEASES=( $(
 EASYRSA_LATEST=${EASYRSA_RELEASES[0]}
 
 # Get the rsa keys
-wget -q -t 3 -T 30 https://github.com/OpenVPN/easy-rsa/releases/download/v${EASYRSA_LATEST}/EasyRSA-${EASYRSA_LATEST}.tgz
-if [ ! -f EasyRSA-${EASYRSA_LATEST}.tgz ];then
-      echo "Failed to load EasyRSA-${EASYRSA_LATEST}.tgz"
-      exit
-fi
+wget -q https://github.com/OpenVPN/easy-rsa/releases/download/v${EASYRSA_LATEST}/EasyRSA-${EASYRSA_LATEST}.tgz
 tar -xaf EasyRSA-${EASYRSA_LATEST}.tgz
 mv EasyRSA-${EASYRSA_LATEST} /etc/openvpn/easy-rsa
 rm -r EasyRSA-${EASYRSA_LATEST}.tgz
@@ -167,7 +163,6 @@ if [[ ! -z $key_cn ]]; then
   export EASYRSA_REQ_CN=$key_cn
 fi
 
-cd /etc/openvpn/easy-rsa
 # Init PKI dirs and build CA certs
 ./easyrsa init-pki
 ./easyrsa build-ca nopass
@@ -201,21 +196,29 @@ printf "\n################## Setup firewall ##################\n"
 echo 1 > "/proc/sys/net/ipv4/ip_forward"
 echo "net.ipv4.ip_forward = 1" >> "/etc/sysctl.conf"
 
+# Get primary NIC device name
+primary_nic=`route | grep '^default' | grep -o '[^ ]*$'`
+
 # Iptable rules
 #iptables -I FORWARD -i tun0 -j ACCEPT
 #iptables -I FORWARD -o tun0 -j ACCEPT
 #iptables -I OUTPUT -o tun0 -j ACCEPT
 
-#iptables -A FORWARD -i tun0 -o eth0 -j ACCEPT
-#iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-#iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -o eth0 -j MASQUERADE
+#iptables -A FORWARD -i tun0 -o $primary_nic -j ACCEPT
+#iptables -t nat -A POSTROUTING -o $primary_nic -j MASQUERADE
+#iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -o $primary_nic -j MASQUERADE
+#iptables -t nat -A POSTROUTING -s 10.8.0.2/24 -o $primary_nic -j MASQUERADE
 
+#Firwall  rules
+#firewall-cmd --add-port=$server_port/$openvpn_proto --permanent
+#firewall-cmd --add-masquerade --permanent
+#firewall-cmd --reload
 
 printf "\n################## Setup MySQL database ##################\n"
 
-echo "CREATE DATABASE \`openvpn\`" | mysql -u root --password="$mysql_root_pass"
+echo "CREATE DATABASE \`openvpn-admin\`" | mysql -u root --password="$mysql_root_pass"
 echo "CREATE USER $mysql_user@localhost IDENTIFIED BY '$mysql_pass'" | mysql -u root --password="$mysql_root_pass"
-echo "GRANT ALL PRIVILEGES ON \`openvpn\`.*  TO $mysql_user@localhost" | mysql -u root --password="$mysql_root_pass"
+echo "GRANT ALL PRIVILEGES ON \`openvpn-admin\`.*  TO $mysql_user@localhost" | mysql -u root --password="$mysql_root_pass"
 echo "FLUSH PRIVILEGES" | mysql -u root --password="$mysql_root_pass"
 
 
@@ -240,7 +243,6 @@ cd "$openvpn_admin"
 sed -i "s/\$user = '';/\$user = '$mysql_user';/" "./include/config.php"
 sed -i "s/\$pass = '';/\$pass = '$mysql_pass';/" "./include/config.php"
 
-
 # Replace in the client configurations with the ip of the server and openvpn protocol
 for file in "./client-conf/gnu-linux/client.conf" "./client-conf/osx-viscosity/client.conf" "./client-conf/windows/client.ovpn"; do
   sed -i "s/remote xxx\.xxx\.xxx\.xxx 443/remote $ip_server $server_port/" $file
@@ -250,20 +252,14 @@ for file in "./client-conf/gnu-linux/client.conf" "./client-conf/osx-viscosity/c
   fi
 done
 
-
 # Copy ta.key inside the client-conf directory
 for directory in "./client-conf/gnu-linux/" "./client-conf/osx-viscosity/" "./client-conf/windows/"; do
   cp "/etc/openvpn/"{ca.crt,ta.key} $directory
 done
 
-#
-mv $openvpn_admin/client-conf/gnu-linux/client.conf $openvpn_admin/client-conf/gnu-linux/$cert_org.conf
-mv $openvpn_admin/client-conf/osx-viscosity/client.conf $openvpn_admin/client-conf/osx-viscosity/$cert_org.conf
-mv $openvpn_admin/client-conf/windows/client.ovpn $openvpn_admin/client-conf/windows/$cert_org.ovpn
 # Install third parties
 bower --allow-root install
 chown -R "$user:$group" "$openvpn_admin"
-
 
 printf "\033[1m\n#################################### Finish ####################################\n"
 
