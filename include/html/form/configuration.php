@@ -27,7 +27,7 @@
           </select>
         </div>
 
-        <input id="configuration_get" name="configuration_get" type="submit" value="Get configuration files" class="btn btn-default" />
+        <input id="configuration_get" name="configuration_get" type="submit" value="下载配置文件" class="btn btn-default" />
       </div>
 
     </form>
