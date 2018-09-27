@@ -42,7 +42,9 @@ Administrate its OpenVPN with a web interface (logs visualisations, users managi
 
 ````
 # yum install epel-release
-# yum install openvpn httpd php-mysql mariadb-server php nodejs unzip git wget sed npm
+# yum install openvpn httpd  mariadb-server  nodejs unzip git wget sed npm
+# rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
+# yum isstall php56w php56w-mysql 
 # npm install -g bower
 # systemctl enable mariadb
 # systemctl start mariadb
