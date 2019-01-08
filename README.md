@@ -67,6 +67,9 @@ Only tested on Debian Jessie. Feel free to open issues.
 
   * Setup the web server (Apache, NGinx...) to serve the web application.
   * Create the admin of the web application by visiting `http://your-installation/index.php?installation`
+  * add boot start command
+
+        $ echo "cd /etc/openvpn && /usr/sbin/openvpn --config /etc/openvpn/server.conf --d" >> /etc/rc.local
 
 ## Usage
 
