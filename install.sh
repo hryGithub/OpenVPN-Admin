@@ -126,7 +126,7 @@ EASYRSA_RELEASES=( $(
 EASYRSA_LATEST=${EASYRSA_RELEASES[0]}
 
 # Get the rsa keys
-wget -q https://github.com/OpenVPN/easy-rsa/releases/download/v${EASYRSA_LATEST}/EasyRSA-${EASYRSA_LATEST}.tgz
+wget -q https://github.com/OpenVPN/easy-rsa/releases/download/v${EASYRSA_LATEST}/EasyRSA-nix-${EASYRSA_LATEST}.tgz
 tar -xaf EasyRSA-${EASYRSA_LATEST}.tgz
 mv EasyRSA-${EASYRSA_LATEST} /etc/openvpn/easy-rsa
 rm -r EasyRSA-${EASYRSA_LATEST}.tgz
@@ -199,6 +199,30 @@ echo "net.ipv4.ip_forward = 1" >> "/etc/sysctl.conf"
 # Get primary NIC device name
 primary_nic=`route | grep '^default' | grep -o '[^ ]*$'`
 
+if [ -x "$(command -v firewall-cmd)" ]; then
+	    firewall-cmd --add-port=$server_port/$openvpn_proto --permanent
+	    #firewall-cmd --zone=trusted --add-service openvpn
+	    #firewall-cmd --zone=trusted --add-service openvpn --permanent
+	    firewall-cmd --add-masquerade --permanent
+	    firewall-cmd --reload
+	elif [ -x "$command -v ufw" ]; then
+	    sed "/# Don't delete these/i \
+	   # START OPENVPN RULES\n# NAT table rules\n*nat\n:POSTROUTING ACCEPT [0:0]\n# Allow traffic from OpenVPN client to eth0 (change to the interface ou discovered!)\n-A POSTROUTING -s 10.8.0.0/8 -o eth0 -j MASQUERADE\nCOMMIT\n# END OPENVPN RULES " -i /etc/ufw/before.rules
+	    sed 's/\(DEFAULT_FORWARD_POLICY="\)\(.*\)"/\1ACCEPT"/'  /etc/ufw/before.rules
+	    ufw allow $server_port/$openvpn_proto
+	    ufw allow OpenSSH
+	else
+	    # Iptable rules
+	    iptables -I FORWARD -i tun0 -j ACCEPT
+	    iptables -I FORWARD -o tun0 -j ACCEPT
+	    iptables -I OUTPUT -o tun0 -j ACCEPT
+	
+	    iptables -A FORWARD -i tun0 -o $primary_nic -j ACCEPT
+	
+	    iptables -t nat -A POSTROUTING -o $primary_nic -j MASQUERADE
+	    iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -o $primary_nic -j MASQUERADE
+	    iptables -t nat -A POSTROUTING -s 10.8.0.2/24 -o $primary_nic -j MASQUERADE
+	fi
 # Iptable rules
 #iptables -I FORWARD -i tun0 -j ACCEPT
 #iptables -I FORWARD -o tun0 -j ACCEPT
